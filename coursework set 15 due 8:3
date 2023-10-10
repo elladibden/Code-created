@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar  6 18:30:23 2023
+
+@author: elladibden
+"""
+import numpy as np
+import matplotlib.pyplot as plt
+
+#%%
+# function for cartesian into polar
+def polar2cart(r, theta):
+    """
+    converting from polar co-ordinates to cartesian co-ordinates
+
+    Parameters
+    ----------
+    r : the length of the line segment from 
+       a cartesian x,y point to the origin
+       (the first value of a polar co-ordinate).
+    
+    theta : the angle between the line segment
+        r and the x axis.
+
+    Returns
+    -------
+    x : the x cartesian value of the 
+        polar co-ordinates.
+    
+    y : the y cartesian value of the
+       polar co-ordinates
+
+    """
+    x = r*np.cos(theta)
+    y = r*np.sin(theta)
+    return(x,y)
+
+
+
+#%%
+p = 1
+q = 1
+a = np.array([1, 3, 9])
+b = np.array([1, 4, 8])
+
+k = polar2cart(p,q)
+print(k)
+
+
+#%% Floret positions
+# Specify number of florets to plot
+nmax = 20
+
+# Parameter to alter positions of florets (=0 for positions that line on a
+# Fermat spiral)
+ndiff = 0
+def floretpos(nmax,ndiff):
+    """
+    fuction finds the florets and
+    returns the cartesian positions
+
+    Parameters
+    ----------
+    nmax : maximum number of florets.
+    
+    ndiff : the placement of the florets
+    
+
+    Returns
+    -------
+    xf : the x cartesian position of
+        the florets.
+    yf : the y cartesian position of
+        the florets.
+
+    """
+    n = np.arange(1,nmax+1)
+    rf = np.sqrt(n)
+    # Define the Golden Mean
+    phi = (1 + np.sqrt(5))/2
+    thetaf = (2*np.pi/phi**2+ndiff)*n
+    xf,yf = polar2cart(rf,thetaf)
+    return xf,yf
+
+
+#%%
+
+xf,yf = floretpos(nmax,ndiff)
+# Plot floret positions
+plt.plot(xf,yf,'ro')
+plt.title('Fermat spiral')
+
+#%% Fermat spiral
+
+# Define the Golden Mean
+phi = (1 + np.sqrt(5))/2
+# Define theta and r
+theta = np.linspace(0,50,500)
+r = np.sqrt(phi**2*theta/(2*np.pi))
+
+# Convert theta and r to Cartesian coordinates
+x,y = polar2cart(r,theta)
+
+# Plot Fermat spiral
+plt.plot(x,y)
+
+#%%
+
+ndiff = np.arange(-0.25,0.26,0.1)
+fig = plt.figure('floret positions',figsize=(12,7))
+z = 1
+
+for count in ndiff:
+    x,y = floretpos(nmax,count)
+    plt.subplot(2,3,z)
+    plt.plot(x,y,'ro')
+    plt.title('ndiff= {:.2f}'.format(count,2,3,z))
+    z+=1
+
+
+
+    
+
+
+
+
+
+
+
+
+
+

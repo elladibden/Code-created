@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 27 09:14:07 2023
+
+@author: elladibden
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.widgets as widgets
+
+
+def getData(data):
+    """ data is the datafile being accessed and x and y are the 2  columns of 
+    data in the file being accessed made into arrays"""
+    x = data[:,0]
+    y = data[:,1]
+    return x,y
+
+
+def fitData(x,y,n):
+    """ x & y are arrays previously found using getdata function or defined
+    in the code manually, n is the polynomial order of the fit  """
+    p = np.polyfit(x,y,n)
+    xfit = np.linspace(min(x),max(x),100)
+    yfit = np.polyval(p,xfit)
+    return xfit,yfit
+
+
+def sliderCallback(val):
+    """ 'val' is the current value selected by the slider
+    Recalculate xfit, yfit values with val as the polynomial order """
+    axesHandleFit.set_ydata(fitData(x,y,val)[1])
+    global n
+    n = val
+    plt.draw()
+        
+
+def radioCallback(label):
+    """ 'label' is the string labelling the selected button """
+    global x, y
+    x,y = getData(eval(label))
+    axesHandleDat.set_xdata(x)
+    axesHandleDat.set_ydata(y)
+    axesHandleFit.set_xdata(fitData(x,y,n)[0])
+    axesHandleFit.set_ydata(fitData(x,y,n)[1])
+    ax.relim()
+    ax.autoscale_view()
+    plt.draw()
+
+#%%
+
+fig = plt.figure(figsize=(8, 5))
+ax = plt.axes([0.1, 0.2, 0.6, 0.7])
+
+data = np.loadtxt('data.txt')
+data1 =np.loadtxt('data1.txt')
+data2 = np.loadtxt('data2.txt')
+n =2
+
+x, y = getData(data)
+xfit, yfit =fitData(x, y, n)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Polynomial fit (select order and data file)')
+
+axesHandleDat = plt.plot(x,y,'r*')
+axesHandleFit = plt.plot(xfit,yfit)
+
+sax = plt.axes([0.2, 0.05, 0.6, 0.03])
+sliderHandle = widgets.Slider(sax, 'polynomial order', 1., 10., valinit=2., 
+                              valfmt="%i")
+
+sliderHandle.on_changed(sliderCallback)
+
+rax = plt.axes([0.75, 0.4, 0.2, 0.3])
+radioHandle = widgets.RadioButtons(rax, ('data.txt', 'data1.txt', 'data2.txt'))
+
+radioHandle.on_clicked(radioCallback)
+
